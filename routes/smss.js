@@ -1,13 +1,9 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const app = express()
-const jsonParser = bodyParser.json()
-
+const express = require('express');
+const router = express.Router();
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
 const mailjet = require('node-mailjet').connect(process.env.MAILJET_API_KEY, process.env.MAILJET_API_SECRET)
-const PORT = process.env.PORT || 3000;
 
 function getEmailRequest(sms) {
     return mailjet
@@ -33,11 +29,7 @@ function getEmailRequest(sms) {
         })
 }
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
-
-app.post('/sms', jsonParser, function (req, res) {
+router.post('/', function (req, res) {
     getEmailRequest(req.body)
         .then((result) => {
             res.sendStatus(200);
@@ -47,6 +39,4 @@ app.post('/sms', jsonParser, function (req, res) {
         })
 })
 
-app.listen(PORT, () => {
-    console.log(`App listening at http://localhost:${PORT}`)
-})
+module.exports = router;
